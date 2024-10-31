@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 20px;
+        }
+        .calculator {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+        .section {
+            background: #111;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .input-group input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #333;
+            color: #fff;
+            font-size: 24px;
+            width: 200px;
+            padding: 5px 0;
+        }
+        .input-group select {
+            background: #222;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            padding: 8px;
+            width: 200px;
+            border-radius: 4px;
+        }
+        .input-group .unit {
+            color: #666;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .result {
+            text-align: right;
+            margin-bottom: 30px;
+        }
+        .result-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .result-value {
+            font-size: 42px;
+            font-weight: 300;
+            color: #4169e1;
+        }
+        .result-period {
+            color: #666;
+            font-size: 16px;
+            margin-left: 8px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #222;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .detail-value {
+            font-size: 18px;
+        }
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .toggle-btn {
+            background: #222;
+            border: none;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background: #4169e1;
+            color: #fff;
+        }
+        .summary {
+            grid-column: 1 / -1;
+            text-align: left;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 20px;
+            background: #111;
+            border-radius: 8px;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="section">
+            <div class="section-title">Paramètres du salaire</div>
+            
+            <div class="toggle-group">
+                <button class="toggle-btn active" id="brut-to-net">Brut → Net</button>
+                <button class="toggle-btn" id="net-to-brut">Net → Brut</button>
+            </div>
+
+            <div class="input-group">
+                <label id="salary-label">Salaire brut</label>
+                <input type="number" id="salary" value="40000">
+                <div class="unit">EUR</div>
+            </div>
+
+            <div class="input-group">
+                <label>Statut</label>
+                <select id="status">
+                    <option value="non-cadre">Non-cadre</option>
+                    <option value="cadre">Cadre</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Temps de travail</label>
+                <select id="workTime">
+                    <option value="full">Temps plein</option>
+                    <option value="partial">Temps partiel</option>
+                </select>
+            </div>
+
+            <div class="input-group" id="hours-group" style="display: none;">
+                <label>Heures par semaine</label>
+                <input type="number" id="hours" value="35">
+                <div class="unit">H</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="result">
+                <div class="result-label">Salaire net</div>
+                <span class="result-value" id="netSalary">31200</span>
+                <span class="result-period">€/an</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Net mensuel</span>
+                <span class="detail-value"><span id="monthlyNet">2600</span> €</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Net mensuel avant impôt</span>
+                <span class="detail-value"><span id="monthlyBeforeTax">2800</span> €</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Détail des cotisations</div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Maladie (0.95%)</span>
+                <span class="detail-value"><span id="healthInsurance">380</span> €</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Vieillesse (7.3%)</span>
+                <span class="detail-value"><span id="pension">2920</span> €</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Chômage (4.05%)</span>
+                <span class="detail-value"><span id="unemployment">1620</span> €</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Retraite complémentaire</span>
+                <span class="detail-value"><span id="complementaryPension">2400</span> €</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">CSG/CRDS (9.7%)</span>
+                <span class="detail-value"><span id="csg">3880</span> €</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Coût employeur</div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Cotisations patronales</span>
+                <span class="detail-value"><span id="employerContributions">20000</span> €</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Coût total employeur</span>
+                <span class="detail-value"><span id="totalCost">60000</span> €</span>
+            </div>
+        </div>
+
+        <div class="summary">
+            Pour un salaire brut annuel de <span id="summaryGross">40000</span> €, soit <span id="summaryGrossMonthly">3333</span> € mensuels :<br>
+            - Salaire net avant impôt : <span id="summaryBeforeTax">2800</span> € / mois<br>
+            - Salaire net après impôt : <span id="summaryNet">2600</span> € / mois<br>
+            - Total des cotisations salariales : <span id="summaryContributions">8800</span> € / an<br>
+            - Coût total pour l'employeur : <span id="summaryCost">60000</span> € / an
+        </div>
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll('input, select');
+        const brutToNetBtn = document.getElementById('brut-to-net');
+        const netToBrutBtn = document.getElementById('net-to-brut');
+        let calculationMode = 'brut-to-net';
+
+        function toggleMode(mode) {
+            calculationMode = mode;
+            const salaryLabel = document.getElementById('salary-label');
+            brutToNetBtn.classList.toggle('active', mode === 'brut-to-net');
+            netToBrutBtn.classList.toggle('active', mode === 'net-to-brut');
+            salaryLabel.textContent = mode === 'brut-to-net' ? 'Salaire brut' : 'Salaire net souhaité';
+            calculateSalary();
+        }
+
+        brutToNetBtn.addEventListener('click', () => toggleMode('brut-to-net'));
+        netToBrutBtn.addEventListener('click', () => toggleMode('net-to-brut'));
+
+        document.getElementById('workTime').addEventListener('change', function() {
+            document.getElementById('hours-group').style.display = 
+                this.value === 'partial' ? 'block' : 'none';
+        });
+
+        function calculateSalary() {
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const status = document.getElementById('status').value;
+            const workTime = document.getElementById('workTime').value;
+            const hours = parseFloat(document.getElementById('hours').value) || 35;
+
+            // Taux de cotisations
+            const rates = {
+                health: 0.0095,
+                pension: 0.073,
+                unemployment: 0.0405,
+                complementaryPension: status === 'cadre' ? 0.085 : 0.06,
+                csg: 0.097,
+                employerRate: status === 'cadre' ? 0.50 : 0.45
+            };
+
+            let grossSalary, netSalary;
+            
+            if (calculationMode === 'brut-to-net') {
+                grossSalary = salary;
+                // Calcul des cotisations
+                const healthInsurance = grossSalary * rates.health;
+                const pension = grossSalary * rates.pension;
+                const unemployment = grossSalary * rates.unemployment;
+                const complementaryPension = grossSalary * rates.complementaryPension;
+                const csg = grossSalary * rates.csg;
+
+                const totalContributions = healthInsurance + pension + unemployment + 
+                                        complementaryPension + csg;
+
+                netSalary = grossSalary - totalContributions;
+
+                // Update cotisations display
+                document.getElementById('healthInsurance').textContent = Math.round(healthInsurance).toLocaleString();
+                document.getElementById('pension').textContent = Math.round(pension).toLocaleString();
+                document.getElementById('unemployment').textContent = Math.round(unemployment).toLocaleString();
+                document.getElementById('complementaryPension').textContent = Math.round(complementaryPension).toLocaleString();
+                document.getElementById('csg').textContent = Math.round(csg).toLocaleString();
+                document.getElementById('summaryContributions').textContent = Math.round(totalContributions).toLocaleString();
+            } else {
+                netSalary = salary;
+                // Calcul approximatif du brut à partir du net souhaité
+                grossSalary = netSalary / (1 - (rates.health + rates.pension + rates.unemployment + 
+                                               rates.complementaryPension + rates.csg));
+            }
+
+            // Ajustement temps partiel
+            if (workTime === 'partial') {
+                const ratio = hours / 35;
+                grossSalary *= ratio;
+                netSalary *= ratio;
+            }
+
+            // Calculs employeur
+            const employerContributions = grossSalary * rates.employerRate;
+            const totalCost = grossSalary + employerContributions;
+
+            // Mise à jour de l'affichage
+            document.getElementById('netSalary').textContent = Math.round(netSalary).toLocaleString();
+            document.getElementById('monthlyNet').textContent = Math.round(netSalary / 12).toLocaleString();
+            document.getElementById('monthlyBeforeTax').textContent = Math.round(netSalary * 1.08 / 12).toLocaleString();
+            document.getElementById('employerContributions').textContent = Math.round(employerContributions).toLocaleString();
+            document.getElementById('totalCost').textContent = Math.round(totalCost).toLocaleString();
+
+            // Mise à jour du résumé
+            document.getElementById('summaryGross').textContent = Math.round(grossSalary).toLocaleString();
+            document.getElementById('summaryGrossMonthly').textContent = Math.round(grossSalary / 12).toLocaleString();
+            document.getElementById('summaryBeforeTax').textContent = Math.round(netSalary * 1.08 / 12).toLocaleString();
+            document.getElementById('summaryNet').textContent = Math.round(netSalary / 12).toLocaleString();
+            document.getElementById('summaryCost').textContent = Math.round(totalCost).toLocaleString();
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', calculateSalary);
+        });
+
+        calculateSalary();
+    </script>
+</body>
+</html>
